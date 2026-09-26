@@ -1,0 +1,22 @@
+# Environment secrets
+.env
+
+# Java / Maven
+backend/target/
+*.class
+*.log
+
+# Node / React
+frontend/node_modules/
+frontend/dist/
+
+# Editors and OS files
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.DS_Store
+Thumbs.db
+
+# Real bank statements used for private testing
+samples/private/
