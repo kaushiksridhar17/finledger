@@ -19,5 +19,26 @@ services:
       timeout: 5s
       retries: 20
 
+  backend:
+    build: ./backend
+    container_name: finledger-backend
+    restart: unless-stopped
+    environment:
+      DB_URL: jdbc:mysql://db:3306/${DB_NAME}?sslMode=DISABLED&allowPublicKeyRetrieval=true
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    container_name: finledger-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
 volumes:
   db_data:
