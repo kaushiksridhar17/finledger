@@ -110,6 +110,13 @@ export async function login(email, password) {
   return data
 }
 
+// "Try the demo": the server creates a throwaway user full of sample data and logs us in as them
+export async function startDemo() {
+  const data = await api('/auth/demo', { method: 'POST', auth: false })
+  accessToken = data.accessToken
+  return data
+}
+
 export function register(name, email, password) {
   return api('/auth/register', { method: 'POST', body: { name, email, password }, auth: false })
 }

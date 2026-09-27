@@ -39,3 +39,17 @@ export function paiseToInput(paise) {
   const abs = Math.abs(paise)
   return `${Math.floor(abs / 100)}.${String(abs % 100).padStart(2, '0')}`
 }
+
+// Short labels for chart axes: 8500000 paise -> "Rs 85k", 12000000 -> "Rs 1.2L" (lakh)
+export function formatCompactPaise(paise) {
+  const rupees = Math.round(paise / 100)
+  const sign = rupees < 0 ? '-' : ''
+  const abs = Math.abs(rupees)
+  if (abs >= 100000) return `${sign}${RUPEE}${trimZero((abs / 100000).toFixed(1))}L`
+  if (abs >= 1000) return `${sign}${RUPEE}${trimZero((abs / 1000).toFixed(1))}k`
+  return `${sign}${RUPEE}${abs}`
+}
+
+function trimZero(text) {
+  return text.endsWith('.0') ? text.slice(0, -2) : text
+}

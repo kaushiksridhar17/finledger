@@ -19,6 +19,13 @@ export default function AppLayout() {
 
   return (
     <div className="min-h-screen bg-slate-50">
+      {user?.demo && (
+        <div className="bg-amber-50 px-4 py-2 text-center text-sm text-amber-900 ring-1 ring-amber-200">
+          You're exploring a demo account filled with sample data. Change anything you like; it's deleted
+          automatically within a day.
+        </div>
+      )}
+
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3">
           <div className="flex items-center gap-6">

@@ -1,23 +1,29 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router'
-import { listAccounts } from '../api/ledger.js'
+import { getDashboard } from '../api/dashboard.js'
 import { useAuth } from '../auth/useAuth.js'
+import CategoryBreakdown from '../components/dashboard/CategoryBreakdown.jsx'
+import MonthlyChart from '../components/dashboard/MonthlyChart.jsx'
+import StatTile from '../components/dashboard/StatTile.jsx'
 import ErrorBanner from '../components/ErrorBanner.jsx'
-import StatusCard from '../components/StatusCard.jsx'
-import { accountTypeLabel } from '../lib/accountTypes.js'
+import { formatDate } from '../lib/dates.js'
 import { formatPaise } from '../lib/money.js'
+import { currentMonth, formatMonth, shiftMonth } from '../lib/months.js'
 
-// Balances for now. Charts for spending by category and monthly trends come in the next part of phase 3.
 export default function DashboardPage() {
   const { user } = useAuth()
-  const [accounts, setAccounts] = useState(null)
+  const [month, setMonth] = useState(currentMonth)
+  const [data, setData] = useState(null)
   const [error, setError] = useState(null)
 
+  // Reload whenever the month changes. The previous month's numbers stay on screen until the new ones arrive.
   useEffect(() => {
     let cancelled = false
-    listAccounts()
-      .then((data) => {
-        if (!cancelled) setAccounts(data)
+    getDashboard(month)
+      .then((result) => {
+        if (cancelled) return
+        setData(result)
+        setError(null)
       })
       .catch((err) => {
         if (!cancelled) setError(err.message)
@@ -25,65 +31,115 @@ export default function DashboardPage() {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [month])
 
-  const active = accounts?.filter((a) => !a.archived) ?? []
-  const total = active.reduce((sum, a) => sum + a.balancePaise, 0)
+  const isLatestMonth = month >= currentMonth()
+  const saved = data ? data.incomePaise - data.spendingPaise : 0
+  const savingsRate = data && data.incomePaise > 0 ? Math.round((saved / data.incomePaise) * 100) : null
+  const hasAnyData = data && (data.recent.length > 0 || data.netWorthPaise !== 0)
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-slate-900">Hi, {user?.name}</h1>
-        <p className="mt-1 text-slate-500">Here's where your money is right now.</p>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-900">Hi, {user?.name}</h1>
+          <p className="mt-1 text-slate-500">Here's how your money moved.</p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setMonth((m) => shiftMonth(m, -1))}
+            aria-label="Previous month"
+            className="rounded-lg px-3 py-1.5 text-slate-600 ring-1 ring-slate-300 hover:bg-slate-100"
+          >
+            &lsaquo;
+          </button>
+          <span className="w-40 text-center font-medium text-slate-900">{formatMonth(month)}</span>
+          <button
+            type="button"
+            onClick={() => setMonth((m) => shiftMonth(m, 1))}
+            disabled={isLatestMonth}
+            aria-label="Next month"
+            className="rounded-lg px-3 py-1.5 text-slate-600 ring-1 ring-slate-300 hover:bg-slate-100 disabled:opacity-40"
+          >
+            &rsaquo;
+          </button>
+        </div>
       </div>
 
       <ErrorBanner message={error} />
 
-      <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
-        <div className="flex items-baseline justify-between">
-          <h2 className="text-lg font-semibold text-slate-900">Balances</h2>
-          {accounts && <span className="text-2xl font-semibold text-slate-900">{formatPaise(total)}</span>}
-        </div>
+      {!data && !error && <p className="text-slate-500">Loading...</p>}
 
-        {!accounts && !error && <p className="mt-4 text-slate-500">Loading...</p>}
-
-        {accounts && active.length === 0 && (
-          <p className="mt-4 text-slate-600">
-            No accounts yet.{' '}
+      {data && !hasAnyData && (
+        <div className="rounded-2xl bg-white p-8 text-center shadow-sm ring-1 ring-slate-200">
+          <p className="text-slate-600">
+            Nothing to show yet.{' '}
             <Link to="/accounts" className="font-medium text-emerald-600 hover:text-emerald-700">
-              Add your first account
-            </Link>
-            .
+              Add an account
+            </Link>{' '}
+            and a few transactions, and this page fills in.
           </p>
-        )}
+        </div>
+      )}
 
-        {active.length > 0 && (
-          <ul className="mt-4 divide-y divide-slate-100">
-            {active.map((a) => (
-              <li key={a.id} className="flex items-center justify-between py-2">
-                <span>
-                  <span className="font-medium text-slate-900">{a.name}</span>{' '}
-                  <span className="text-xs text-slate-500">{accountTypeLabel(a.type)}</span>
-                </span>
-                <span className={`font-medium ${a.balancePaise < 0 ? 'text-rose-600' : 'text-slate-900'}`}>
-                  {formatPaise(a.balancePaise)}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
+      {data && hasAnyData && (
+        <>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <StatTile label="Net worth" value={formatPaise(data.netWorthPaise)} note="All active accounts, today" />
+            <StatTile label="Income" value={formatPaise(data.incomePaise)} note={formatMonth(month)} />
+            <StatTile label="Spending" value={formatPaise(data.spendingPaise)} note="Transfers and SIPs not counted" />
+            <StatTile
+              label="Saved"
+              value={formatPaise(saved)}
+              note={savingsRate === null ? 'No income this month' : `${savingsRate}% of income`}
+            />
+          </div>
 
-        {active.length > 0 && (
-          <Link
-            to="/transactions"
-            className="mt-4 inline-block rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
-          >
-            View transactions
-          </Link>
-        )}
-      </section>
+          <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+            <h2 className="text-lg font-semibold text-slate-900">Income and spending, last 12 months</h2>
+            <p className="mb-4 text-sm text-slate-500">Click a month to see it in detail.</p>
+            <MonthlyChart months={data.monthly} selectedMonth={month} onSelectMonth={setMonth} />
+          </section>
 
-      <StatusCard />
+          <div className="grid gap-6 lg:grid-cols-2">
+            <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+              <h2 className="mb-4 text-lg font-semibold text-slate-900">Where it went in {formatMonth(month)}</h2>
+              <CategoryBreakdown categories={data.spendingByCategory} totalPaise={data.spendingPaise} />
+            </section>
+
+            <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+              <div className="mb-4 flex items-baseline justify-between">
+                <h2 className="text-lg font-semibold text-slate-900">Recent transactions</h2>
+                <Link to="/transactions" className="text-sm font-medium text-emerald-600 hover:text-emerald-700">
+                  View all
+                </Link>
+              </div>
+              <ul className="divide-y divide-slate-100">
+                {data.recent.map((t) => (
+                  <li key={t.id} className="flex items-center justify-between gap-3 py-2 text-sm">
+                    <span className="min-w-0">
+                      <span className="block truncate font-medium text-slate-900">{t.description}</span>
+                      <span className="text-xs text-slate-500">
+                        {formatDate(t.date)} &middot; {t.categoryName ?? 'Uncategorised'}
+                      </span>
+                    </span>
+                    <span
+                      className={`shrink-0 tabular-nums font-medium ${
+                        t.amountPaise > 0 ? 'text-emerald-700' : 'text-slate-900'
+                      }`}
+                    >
+                      {t.amountPaise > 0 ? '+' : ''}
+                      {formatPaise(t.amountPaise)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          </div>
+        </>
+      )}
     </div>
   )
 }
