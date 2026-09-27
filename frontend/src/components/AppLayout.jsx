@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { to: '/budgets', label: 'Budgets' },
   { to: '/recurring', label: 'Bills' },
   { to: '/split', label: 'Split' },
+  { to: '/investments', label: 'Investments' },
   { to: '/accounts', label: 'Accounts' },
   { to: '/import', label: 'Import' },
 ]

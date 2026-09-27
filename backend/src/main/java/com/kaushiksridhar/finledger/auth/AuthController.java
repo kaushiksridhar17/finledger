@@ -52,6 +52,7 @@ public class AuthController {
     public ResponseEntity<AuthResponse> demo(
             @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent) {
 
+        demoService.prepare();   // anything slow (fetching fund prices) happens before the database transaction
         User demoUser = demoService.createDemoUser();
         return loggedIn(authService.startSession(demoUser, userAgent));
     }

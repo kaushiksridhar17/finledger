@@ -6,6 +6,7 @@ import BudgetsPage from './pages/BudgetsPage.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
 import GroupPage from './pages/GroupPage.jsx'
 import ImportPage from './pages/ImportPage.jsx'
+import InvestmentsPage from './pages/InvestmentsPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import RecurringPage from './pages/RecurringPage.jsx'
 import RegisterPage from './pages/RegisterPage.jsx'
@@ -33,6 +34,7 @@ function App() {
         <Route path="recurring" element={<RecurringPage />} />
         <Route path="split" element={<SplitPage />} />
         <Route path="split/:groupId" element={<GroupPage />} />
+        <Route path="investments" element={<InvestmentsPage />} />
         <Route path="accounts" element={<AccountsPage />} />
         <Route path="import" element={<ImportPage />} />
       </Route>

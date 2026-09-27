@@ -42,6 +42,7 @@ class DemoFlowTest {
     @BeforeEach
     void cleanDatabase() {
         jdbcTemplate.update("DELETE FROM users");
+        jdbcTemplate.update("DELETE FROM mf_schemes");   // the demo's fund NAVs are fetched fresh from FakeNavSource
     }
 
     @Test
@@ -96,6 +97,30 @@ class DemoFlowTest {
 
         List<String> types = JsonPath.read(body("/api/notifications", auth), "$.items[*].type");
         assertThat(types).contains("SETTLEMENT_MATCH");
+    }
+
+    @Test
+    @DisplayName("the demo has a mutual fund portfolio: its monthly SIP debits as purchases, plus a lump sum")
+    void demoPortfolio() throws Exception {
+        String auth = bearer(mockMvc.perform(post("/api/auth/demo")).andExpect(status().isOk()).andReturn());
+
+        String portfolio = body("/api/investments", auth);
+        List<String> funds = JsonPath.read(portfolio, "$.funds[*].name");
+        assertThat(funds).containsExactlyInAnyOrder(
+                "Parag Parikh Flexi Cap Fund - Direct Plan - Growth",
+                "UTI Nifty 50 Index Fund - Direct Plan - Growth");
+
+        Number sipPurchases = JsonPath.read(portfolio, "$.sips[0].purchases");
+        assertThat(sipPurchases.intValue()).isGreaterThanOrEqualTo(10);    // one a month for about a year
+
+        List<Number> lumpSum = JsonPath.read(portfolio, "$.transactions[?(@.fromBank == false)].amountPaise");
+        assertThat(lumpSum).hasSize(1);
+        assertThat(lumpSum.get(0).longValue()).isEqualTo(5_000_000);
+
+        Number value = JsonPath.read(portfolio, "$.valuePaise");
+        assertThat(value.longValue()).isPositive();
+        List<Object> suggestions = JsonPath.read(body("/api/investments/sip-suggestions", auth), "$");
+        assertThat(suggestions).isEmpty();
     }
 
     @Test

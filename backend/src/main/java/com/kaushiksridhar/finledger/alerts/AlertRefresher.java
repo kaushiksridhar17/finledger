@@ -8,14 +8,16 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import com.kaushiksridhar.finledger.budget.BudgetAlertService;
+import com.kaushiksridhar.finledger.investment.InvestmentService;
 import com.kaushiksridhar.finledger.recurring.RecurringService;
 import com.kaushiksridhar.finledger.split.PaymentMatchService;
 
 /**
  * After the ledger changes: re-checks the user's budgets (and optionally rescans for repeating payments),
- * then looks for friends paying the user back. Each runs in a database transaction of its own, and
- * failures are logged and swallowed: an alert going wrong must never turn the user's successful save
- * or import into an error, and one check failing doesn't stop the other.
+ * looks for friends paying the user back, and turns new SIP debits into fund purchases.
+ * Each runs in a database transaction of its own, and failures are logged and swallowed: an alert going
+ * wrong must never turn the user's successful save or import into an error, and one check failing
+ * doesn't stop the others.
  */
 @Component
 public class AlertRefresher {
@@ -25,15 +27,18 @@ public class AlertRefresher {
     private final BudgetAlertService budgetAlertService;
     private final RecurringService recurringService;
     private final PaymentMatchService paymentMatchService;
+    private final InvestmentService investmentService;
     private final TransactionTemplate newTransaction;
 
     public AlertRefresher(BudgetAlertService budgetAlertService,
             RecurringService recurringService,
             PaymentMatchService paymentMatchService,
+            InvestmentService investmentService,
             PlatformTransactionManager transactionManager) {
         this.budgetAlertService = budgetAlertService;
         this.recurringService = recurringService;
         this.paymentMatchService = paymentMatchService;
+        this.investmentService = investmentService;
         this.newTransaction = new TransactionTemplate(transactionManager);
         this.newTransaction.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
     }
@@ -46,6 +51,7 @@ public class AlertRefresher {
             }
         });
         runSafely(userId, "repayment matches", () -> paymentMatchService.scan(userId));
+        runSafely(userId, "SIP purchases", () -> investmentService.syncSips(userId));
     }
 
     private void runSafely(long userId, String what, Runnable work) {

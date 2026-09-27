@@ -38,7 +38,7 @@ import com.kaushiksridhar.finledger.user.UserRepository;
 
 /**
  * "Try the demo": every click gets its own throwaway user filled with a year of history, budgets,
- * bills and split groups, so visitors never see or change each other's data.
+ * bills, split groups and mutual funds, so visitors never see or change each other's data.
  * DemoCleanupJob deletes them after the TTL.
  */
 @Service
@@ -71,6 +71,7 @@ public class DemoService {
     private final BudgetAlertService budgetAlertService;
     private final RecurringService recurringService;
     private final DemoSplitGroups demoSplitGroups;
+    private final DemoPortfolio demoPortfolio;
     private final Clock clock;
 
     public DemoService(UserRepository userRepository,
@@ -83,6 +84,7 @@ public class DemoService {
             BudgetAlertService budgetAlertService,
             RecurringService recurringService,
             DemoSplitGroups demoSplitGroups,
+            DemoPortfolio demoPortfolio,
             Clock clock) {
         this.userRepository = userRepository;
         this.accountRepository = accountRepository;
@@ -94,7 +96,19 @@ public class DemoService {
         this.budgetAlertService = budgetAlertService;
         this.recurringService = recurringService;
         this.demoSplitGroups = demoSplitGroups;
+        this.demoPortfolio = demoPortfolio;
         this.clock = clock;
+    }
+
+    /**
+     * Fetches the demo's mutual funds from mfapi.in if they aren't cached yet. Call it before createDemoUser:
+     * it isn't transactional, so a slow network call never holds the demo's database transaction open, and
+     * what it stores is committed (and so visible) before that transaction starts.
+     */
+    public void prepare() {
+        if (properties.enabled()) {
+            demoPortfolio.prefetchFunds();
+        }
     }
 
     @Transactional
@@ -125,6 +139,7 @@ public class DemoService {
         insertTransactions(user.getId(), transactions, accountIds, categoryIds, now);
         setUpBudgetsAndBills(user.getId(), categoryIds);
         demoSplitGroups.create(user.getId(), accountIds.get(AccountKey.HDFC), categoryIds.get("Transfer"), today);
+        demoPortfolio.create(user.getId(), today);
 
         return user;
     }
