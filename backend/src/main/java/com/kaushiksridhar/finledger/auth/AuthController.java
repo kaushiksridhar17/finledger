@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kaushiksridhar.finledger.common.ApiException;
 import com.kaushiksridhar.finledger.common.ApiExceptionHandler;
+import com.kaushiksridhar.finledger.demo.DemoService;
+import com.kaushiksridhar.finledger.user.User;
 import com.kaushiksridhar.finledger.user.UserResponse;
 
 import jakarta.validation.Valid;
@@ -22,10 +24,12 @@ import jakarta.validation.Valid;
 public class AuthController {
 
     private final AuthService authService;
+    private final DemoService demoService;
     private final RefreshCookies refreshCookies;
 
-    public AuthController(AuthService authService, RefreshCookies refreshCookies) {
+    public AuthController(AuthService authService, DemoService demoService, RefreshCookies refreshCookies) {
         this.authService = authService;
+        this.demoService = demoService;
         this.refreshCookies = refreshCookies;
     }
 
@@ -40,12 +44,16 @@ public class AuthController {
             @Valid @RequestBody LoginRequest request,
             @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent) {
 
-        LoginResult result = authService.login(request, userAgent);
+        return loggedIn(authService.login(request, userAgent));
+    }
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE,
-                        refreshCookies.create(result.refreshToken(), result.refreshTokenExpiresAt()).toString())
-                .body(AuthResponse.from(result));
+    /** "Try the demo": creates a fresh demo user with a year of data and logs straight in as them. */
+    @PostMapping("/demo")
+    public ResponseEntity<AuthResponse> demo(
+            @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent) {
+
+        User demoUser = demoService.createDemoUser();
+        return loggedIn(authService.startSession(demoUser, userAgent));
     }
 
     /**
@@ -82,5 +90,13 @@ public class AuthController {
         return ResponseEntity.noContent()
                 .header(HttpHeaders.SET_COOKIE, refreshCookies.clear().toString())
                 .build();
+    }
+
+    // Access token in the body, refresh token in the HttpOnly cookie
+    private ResponseEntity<AuthResponse> loggedIn(LoginResult result) {
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE,
+                        refreshCookies.create(result.refreshToken(), result.refreshTokenExpiresAt()).toString())
+                .body(AuthResponse.from(result));
     }
 }

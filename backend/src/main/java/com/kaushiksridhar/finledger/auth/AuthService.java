@@ -87,7 +87,9 @@ public class AuthService {
         return startSession(user, userAgent);
     }
 
-    private LoginResult startSession(User user, String userAgent) {
+    /** Creates a session (a login) for a user who has already been verified. Also used by the demo button. */
+    @Transactional
+    public LoginResult startSession(User user, String userAgent) {
         Instant now = clock.instant();
         String secret = RefreshTokens.newSecret();
 

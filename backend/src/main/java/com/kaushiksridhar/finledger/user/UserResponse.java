@@ -8,6 +8,7 @@ public record UserResponse(
         String name,
         String email,
         String baseCurrency,
+        boolean demo,
         Instant createdAt) {
 
     public static UserResponse from(User user) {
@@ -16,6 +17,7 @@ public record UserResponse(
                 user.getName(),
                 user.getEmail(),
                 user.getBaseCurrency(),
+                user.isDemo(),
                 user.getCreatedAt());
     }
 }

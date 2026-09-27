@@ -38,6 +38,10 @@ public class User {
     @Column(name = "base_currency", nullable = false, length = 3)
     private String baseCurrency = "INR";
 
+    // Set only for "Try the demo" users. A scheduled job deletes them after this time.
+    @Column(name = "demo_expires_at")
+    private Instant demoExpiresAt;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
@@ -48,6 +52,10 @@ public class User {
         this.name = name;
         this.email = email;
         this.passwordHash = passwordHash;
+    }
+
+    public boolean isDemo() {
+        return demoExpiresAt != null;
     }
 
     @PrePersist

@@ -13,6 +13,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.kaushiksridhar.finledger.category.CategoryKind;
+
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
     /**
@@ -70,5 +72,69 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
         Long getAccountId();
 
         Long getTotal();
+    }
+
+    // ------------------------------------------------------------------ dashboard
+
+    /**
+     * Income and spending per calendar month. Transfers (moving money between your own accounts,
+     * SIPs, credit card bills) are left out: they are neither earning nor spending.
+     * Pass CategoryKind.TRANSFER as the "transfer" parameter.
+     */
+    @Query("""
+            select year(t.txnDate) as yr,
+                   month(t.txnDate) as mon,
+                   sum(case when t.amountPaise > 0 then t.amountPaise else 0L end) as income,
+                   sum(case when t.amountPaise < 0 then -t.amountPaise else 0L end) as spending
+            from Transaction t left join t.category c
+            where t.user.id = :userId
+              and t.txnDate between :fromDate and :toDate
+              and (c is null or c.kind <> :transfer)
+            group by year(t.txnDate), month(t.txnDate)
+            """)
+    List<MonthlyTotalRow> monthlyTotals(
+            @Param("userId") Long userId,
+            @Param("fromDate") LocalDate fromDate,
+            @Param("toDate") LocalDate toDate,
+            @Param("transfer") CategoryKind transfer);
+
+    /** Spending per category between two dates, biggest first. Uncategorised spending comes back with a null id. */
+    @Query("""
+            select c.id as categoryId,
+                   c.name as name,
+                   c.color as color,
+                   sum(-t.amountPaise) as total
+            from Transaction t left join t.category c
+            where t.user.id = :userId
+              and t.amountPaise < 0
+              and t.txnDate between :fromDate and :toDate
+              and (c is null or c.kind <> :transfer)
+            group by c.id, c.name, c.color
+            order by sum(-t.amountPaise) desc
+            """)
+    List<CategoryTotalRow> spendingByCategory(
+            @Param("userId") Long userId,
+            @Param("fromDate") LocalDate fromDate,
+            @Param("toDate") LocalDate toDate,
+            @Param("transfer") CategoryKind transfer);
+
+    interface MonthlyTotalRow {
+        Number getYr();
+
+        Number getMon();
+
+        Number getIncome();
+
+        Number getSpending();
+    }
+
+    interface CategoryTotalRow {
+        Long getCategoryId();
+
+        String getName();
+
+        String getColor();
+
+        Number getTotal();
     }
 }
