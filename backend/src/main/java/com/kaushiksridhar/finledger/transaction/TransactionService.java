@@ -2,6 +2,7 @@ package com.kaushiksridhar.finledger.transaction;
 
 import java.util.Locale;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -29,15 +30,18 @@ public class TransactionService {
     private final AccountService accountService;
     private final CategoryService categoryService;
     private final UserRepository userRepository;
+    private final ApplicationEventPublisher events;
 
     public TransactionService(TransactionRepository transactionRepository,
             AccountService accountService,
             CategoryService categoryService,
-            UserRepository userRepository) {
+            UserRepository userRepository,
+            ApplicationEventPublisher events) {
         this.transactionRepository = transactionRepository;
         this.accountService = accountService;
         this.categoryService = categoryService;
         this.userRepository = userRepository;
+        this.events = events;
     }
 
     @Transactional(readOnly = true)
@@ -75,19 +79,24 @@ public class TransactionService {
         Transaction transaction = new Transaction();
         transaction.setUser(userRepository.getReferenceById(userId));
         apply(userId, transaction, request);
-        return TransactionResponse.from(transactionRepository.save(transaction));
+        TransactionResponse saved = TransactionResponse.from(transactionRepository.save(transaction));
+        events.publishEvent(new LedgerChangedEvent(userId, false));   // budget alerts run after commit
+        return saved;
     }
 
     @Transactional
     public TransactionResponse update(long userId, long transactionId, TransactionRequest request) {
         Transaction transaction = getOwned(userId, transactionId);
         apply(userId, transaction, request);
-        return TransactionResponse.from(transactionRepository.save(transaction));
+        TransactionResponse saved = TransactionResponse.from(transactionRepository.save(transaction));
+        events.publishEvent(new LedgerChangedEvent(userId, false));
+        return saved;
     }
 
     @Transactional
     public void delete(long userId, long transactionId) {
         transactionRepository.delete(getOwned(userId, transactionId));
+        events.publishEvent(new LedgerChangedEvent(userId, false));
     }
 
     // Copies the request onto the entity after checking the account and category belong to this user

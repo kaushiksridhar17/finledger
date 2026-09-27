@@ -1,5 +1,8 @@
 package com.kaushiksridhar.finledger.common;
 
+import java.time.Clock;
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.ZoneId;
 
 /**
@@ -11,5 +14,13 @@ public final class AppTime {
     public static final ZoneId ZONE = ZoneId.of("Asia/Kolkata");
 
     private AppTime() {
+    }
+
+    public static LocalDate today(Clock clock) {
+        return LocalDate.ofInstant(clock.instant(), ZONE);
+    }
+
+    public static YearMonth thisMonth(Clock clock) {
+        return YearMonth.from(today(clock));
     }
 }

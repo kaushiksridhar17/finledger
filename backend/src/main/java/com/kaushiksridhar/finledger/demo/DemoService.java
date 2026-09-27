@@ -20,6 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.kaushiksridhar.finledger.account.Account;
 import com.kaushiksridhar.finledger.account.AccountRepository;
+import com.kaushiksridhar.finledger.budget.BudgetAlertService;
+import com.kaushiksridhar.finledger.budget.BudgetRequest;
+import com.kaushiksridhar.finledger.budget.BudgetService;
 import com.kaushiksridhar.finledger.category.Category;
 import com.kaushiksridhar.finledger.category.CategoryRepository;
 import com.kaushiksridhar.finledger.common.ApiException;
@@ -27,6 +30,9 @@ import com.kaushiksridhar.finledger.common.AppTime;
 import com.kaushiksridhar.finledger.demo.DemoDataGenerator.AccountKey;
 import com.kaushiksridhar.finledger.demo.DemoDataGenerator.DemoAccount;
 import com.kaushiksridhar.finledger.demo.DemoDataGenerator.DemoTransaction;
+import com.kaushiksridhar.finledger.recurring.Direction;
+import com.kaushiksridhar.finledger.recurring.RecurringService;
+import com.kaushiksridhar.finledger.recurring.RecurringStatus;
 import com.kaushiksridhar.finledger.user.User;
 import com.kaushiksridhar.finledger.user.UserRepository;
 
@@ -40,6 +46,14 @@ public class DemoService {
     static final String DEMO_NAME = "Arjun Mehta";
     private static final long SEED = 42L;
 
+    // Monthly limits set up for the demo user, so the Budgets page has something to show
+    private static final Map<String, Long> DEMO_BUDGETS = Map.of(
+            "Food & Dining", 1_000_000L,
+            "Groceries", 800_000L,
+            "Shopping", 500_000L,
+            "Entertainment", 150_000L,
+            "Transport", 300_000L);
+
     private static final String INSERT_TRANSACTION = """
             INSERT INTO transactions
                 (user_id, account_id, category_id, amount_paise, txn_date, description, merchant, notes, created_at, updated_at)
@@ -52,6 +66,9 @@ public class DemoService {
     private final PasswordEncoder passwordEncoder;
     private final JdbcTemplate jdbcTemplate;
     private final DemoProperties properties;
+    private final BudgetService budgetService;
+    private final BudgetAlertService budgetAlertService;
+    private final RecurringService recurringService;
     private final Clock clock;
 
     public DemoService(UserRepository userRepository,
@@ -60,6 +77,9 @@ public class DemoService {
             PasswordEncoder passwordEncoder,
             JdbcTemplate jdbcTemplate,
             DemoProperties properties,
+            BudgetService budgetService,
+            BudgetAlertService budgetAlertService,
+            RecurringService recurringService,
             Clock clock) {
         this.userRepository = userRepository;
         this.accountRepository = accountRepository;
@@ -67,6 +87,9 @@ public class DemoService {
         this.passwordEncoder = passwordEncoder;
         this.jdbcTemplate = jdbcTemplate;
         this.properties = properties;
+        this.budgetService = budgetService;
+        this.budgetAlertService = budgetAlertService;
+        this.recurringService = recurringService;
         this.clock = clock;
     }
 
@@ -95,8 +118,26 @@ public class DemoService {
 
         List<DemoTransaction> transactions = DemoDataGenerator.generate(LocalDate.ofInstant(now, AppTime.ZONE), SEED);
         insertTransactions(user.getId(), transactions, accountIds, categoryIds, now);
+        setUpBudgetsAndBills(user.getId(), categoryIds);
 
         return user;
+    }
+
+    /**
+     * Gives the demo user some budgets, detects their repeating payments, and confirms the bills
+     * and subscriptions so reminders appear. Salary and interest are left as suggestions, so a
+     * visitor can try confirming one. All of this runs in the same transaction as the data above.
+     */
+    private void setUpBudgetsAndBills(long userId, Map<String, Long> categoryIds) {
+        DEMO_BUDGETS.forEach((category, limit) ->
+                budgetService.create(userId, new BudgetRequest(categoryIds.get(category), limit)));
+
+        recurringService.scan(userId);
+        recurringService.overview(userId).items().stream()
+                .filter(item -> item.direction() == Direction.OUT)
+                .forEach(item -> recurringService.setStatus(userId, item.id(), RecurringStatus.CONFIRMED));
+
+        budgetAlertService.checkCurrentMonth(userId);
     }
 
     private Map<AccountKey, Long> createAccounts(User user) {

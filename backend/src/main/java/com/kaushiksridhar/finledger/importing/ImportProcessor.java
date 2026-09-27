@@ -21,18 +21,26 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import com.kaushiksridhar.finledger.account.Account;
 import com.kaushiksridhar.finledger.account.AccountRepository;
+import com.kaushiksridhar.finledger.alerts.AlertRefresher;
 import com.kaushiksridhar.finledger.importing.format.ParsedStatement;
 import com.kaushiksridhar.finledger.importing.format.StatementFormatException;
 import com.kaushiksridhar.finledger.importing.format.StatementParser;
 import com.kaushiksridhar.finledger.importing.format.StatementRow;
+import com.kaushiksridhar.finledger.notification.NotificationService;
+import com.kaushiksridhar.finledger.notification.NotificationType;
 import com.kaushiksridhar.finledger.rules.Categorizer;
 import com.kaushiksridhar.finledger.rules.CategorizerFactory;
 
 /**
  * The background side of an import. Runs on the import thread pool, after the upload request has
- * already returned, and moves the batch QUEUED -> PROCESSING -> COMPLETED (or FAILED).
+ * already returned, and moves the batch QUEUED -> PROCESSING -> COMPLETED (or FAILED):
  *
- * Saving happens in one database transaction: either every new row from the file is stored or none are.
+ * 1. parse the file
+ * 2. save the new rows (one database transaction: either every new row is stored or none are)
+ * 3. check budgets and rescan for repeating payments with the new data
+ * 4. mark the batch COMPLETED and notify the user
+ *
+ * The batch only shows COMPLETED once step 3 is done, so "Done" really means everything is up to date.
  */
 @Component
 public class ImportProcessor {
@@ -58,6 +66,10 @@ public class ImportProcessor {
             WHERE account_id = :accountId AND dedupe_hash IN (:hashes)
             """;
 
+    /** What step 2 produced, needed by steps 3 and 4. */
+    private record Saved(long userId, int imported, int duplicates, int failedLines) {
+    }
+
     private final ImportBatchRepository batchRepository;
     private final ImportRowErrorRepository rowErrorRepository;
     private final AccountRepository accountRepository;
@@ -65,6 +77,8 @@ public class ImportProcessor {
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcTemplate namedJdbcTemplate;
     private final TransactionTemplate transactionTemplate;
+    private final NotificationService notificationService;
+    private final AlertRefresher alertRefresher;
     private final Clock clock;
 
     public ImportProcessor(ImportBatchRepository batchRepository,
@@ -74,6 +88,8 @@ public class ImportProcessor {
             JdbcTemplate jdbcTemplate,
             NamedParameterJdbcTemplate namedJdbcTemplate,
             TransactionTemplate transactionTemplate,
+            NotificationService notificationService,
+            AlertRefresher alertRefresher,
             Clock clock) {
         this.batchRepository = batchRepository;
         this.rowErrorRepository = rowErrorRepository;
@@ -82,6 +98,8 @@ public class ImportProcessor {
         this.jdbcTemplate = jdbcTemplate;
         this.namedJdbcTemplate = namedJdbcTemplate;
         this.transactionTemplate = transactionTemplate;
+        this.notificationService = notificationService;
+        this.alertRefresher = alertRefresher;
         this.clock = clock;
     }
 
@@ -92,7 +110,12 @@ public class ImportProcessor {
 
             ParsedStatement statement = StatementParser.parse(new String(content, StandardCharsets.UTF_8));
 
-            transactionTemplate.executeWithoutResult(status -> save(batchId, statement));
+            Saved saved = transactionTemplate.execute(status -> save(batchId, statement));
+
+            // Handles its own errors: a problem with alerts never fails the import
+            alertRefresher.refresh(saved.userId(), true);
+
+            transactionTemplate.executeWithoutResult(status -> complete(batchId, saved));
         } catch (StatementFormatException e) {
             fail(batchId, e.getMessage());
         } catch (RuntimeException e) {
@@ -105,7 +128,7 @@ public class ImportProcessor {
         batchRepository.findById(batchId).orElseThrow().setStatus(ImportStatus.PROCESSING);
     }
 
-    private void save(long batchId, ParsedStatement statement) {
+    private Saved save(long batchId, ParsedStatement statement) {
         ImportBatch batch = batchRepository.findById(batchId).orElseThrow();
         long userId = batch.getUser().getId();
 
@@ -151,8 +174,21 @@ public class ImportProcessor {
         batch.setRowsImported(inserts.size());
         batch.setRowsDuplicate(duplicates);
         batch.setRowsFailed(statement.errors().size());
+
+        return new Saved(userId, inserts.size(), duplicates, statement.errors().size());
+    }
+
+    private void complete(long batchId, Saved saved) {
+        ImportBatch batch = batchRepository.findById(batchId).orElseThrow();
         batch.setStatus(ImportStatus.COMPLETED);
         batch.setCompletedAt(clock.instant());
+
+        String summary = saved.imported() + (saved.imported() == 1 ? " new transaction" : " new transactions")
+                + (saved.duplicates() > 0 ? ", " + saved.duplicates() + " already imported" : "")
+                + (saved.failedLines() > 0 ? ", " + saved.failedLines() + " lines couldn't be read" : "")
+                + ".";
+        notificationService.notify(saved.userId(), NotificationType.IMPORT_FINISHED, "import:" + batchId,
+                batch.getFileName() + " imported", summary, "/import");
     }
 
     private Set<String> existingHashes(long accountId, List<String> hashes) {
@@ -171,6 +207,8 @@ public class ImportProcessor {
                 batch.setStatus(ImportStatus.FAILED);
                 batch.setErrorMessage(message.length() <= 500 ? message : message.substring(0, 500));
                 batch.setCompletedAt(clock.instant());
+                notificationService.notify(batch.getUser().getId(), NotificationType.IMPORT_FAILED,
+                        "import:" + batchId, batch.getFileName() + " couldn't be imported", message, "/import");
             }));
         } catch (RuntimeException e) {
             log.error("Couldn't record failure of import {}", batchId, e);

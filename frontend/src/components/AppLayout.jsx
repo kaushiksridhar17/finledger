@@ -1,9 +1,12 @@
 import { NavLink, Outlet, useNavigate } from 'react-router'
 import { useAuth } from '../auth/useAuth.js'
+import NotificationBell from './NotificationBell.jsx'
 
 const NAV_ITEMS = [
   { to: '/', label: 'Dashboard', end: true },
   { to: '/transactions', label: 'Transactions' },
+  { to: '/budgets', label: 'Budgets' },
+  { to: '/recurring', label: 'Bills' },
   { to: '/accounts', label: 'Accounts' },
   { to: '/import', label: 'Import' },
 ]
@@ -29,16 +32,16 @@ export default function AppLayout() {
 
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3">
-          <div className="flex items-center gap-6">
+          <div className="flex min-w-0 items-center gap-6">
             <span className="text-lg font-semibold text-emerald-600">FinLedger</span>
-            <nav className="flex gap-1">
+            <nav className="flex gap-1 overflow-x-auto">
               {NAV_ITEMS.map((item) => (
                 <NavLink
                   key={item.to}
                   to={item.to}
                   end={item.end}
                   className={({ isActive }) =>
-                    `rounded-lg px-3 py-1.5 text-sm font-medium ${
+                    `whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium ${
                       isActive ? 'bg-emerald-50 text-emerald-700' : 'text-slate-600 hover:bg-slate-100'
                     }`
                   }
@@ -49,8 +52,9 @@ export default function AppLayout() {
             </nav>
           </div>
 
-          <div className="flex items-center gap-3">
-            <span className="hidden text-sm text-slate-600 sm:inline">{user?.name}</span>
+          <div className="flex shrink-0 items-center gap-3">
+            <NotificationBell />
+            <span className="hidden text-sm text-slate-600 lg:inline">{user?.name}</span>
             <button
               type="button"
               onClick={handleLogout}

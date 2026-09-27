@@ -2,9 +2,11 @@ import { Navigate, Route, Routes } from 'react-router'
 import RequireAuth from './auth/RequireAuth.jsx'
 import AppLayout from './components/AppLayout.jsx'
 import AccountsPage from './pages/AccountsPage.jsx'
+import BudgetsPage from './pages/BudgetsPage.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
 import ImportPage from './pages/ImportPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
+import RecurringPage from './pages/RecurringPage.jsx'
 import RegisterPage from './pages/RegisterPage.jsx'
 import TransactionsPage from './pages/TransactionsPage.jsx'
 
@@ -25,6 +27,8 @@ function App() {
       >
         <Route index element={<DashboardPage />} />
         <Route path="transactions" element={<TransactionsPage />} />
+        <Route path="budgets" element={<BudgetsPage />} />
+        <Route path="recurring" element={<RecurringPage />} />
         <Route path="accounts" element={<AccountsPage />} />
         <Route path="import" element={<ImportPage />} />
       </Route>

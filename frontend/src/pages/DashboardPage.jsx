@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router'
 import { getDashboard } from '../api/dashboard.js'
+import { upcomingBills } from '../api/recurring.js'
 import { useAuth } from '../auth/useAuth.js'
 import CategoryBreakdown from '../components/dashboard/CategoryBreakdown.jsx'
 import MonthlyChart from '../components/dashboard/MonthlyChart.jsx'
@@ -9,12 +10,27 @@ import ErrorBanner from '../components/ErrorBanner.jsx'
 import { formatDate } from '../lib/dates.js'
 import { formatPaise } from '../lib/money.js'
 import { currentMonth, formatMonth, shiftMonth } from '../lib/months.js'
+import { dueLabel } from '../lib/recurring.js'
 
 export default function DashboardPage() {
   const { user } = useAuth()
   const [month, setMonth] = useState(currentMonth)
   const [data, setData] = useState(null)
   const [error, setError] = useState(null)
+  const [upcoming, setUpcoming] = useState([])
+
+  // Confirmed bills due in the next two weeks
+  useEffect(() => {
+    let cancelled = false
+    upcomingBills(14)
+      .then((items) => {
+        if (!cancelled) setUpcoming(items)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   // Reload whenever the month changes. The previous month's numbers stay on screen until the new ones arrive.
   useEffect(() => {
@@ -96,6 +112,31 @@ export default function DashboardPage() {
               note={savingsRate === null ? 'No income this month' : `${savingsRate}% of income`}
             />
           </div>
+
+          {upcoming.length > 0 && (
+            <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+              <div className="mb-3 flex items-baseline justify-between">
+                <h2 className="text-lg font-semibold text-slate-900">Coming up in the next 2 weeks</h2>
+                <Link to="/recurring" className="text-sm font-medium text-emerald-600 hover:text-emerald-700">
+                  All bills
+                </Link>
+              </div>
+              <ul className="grid gap-x-8 gap-y-2 sm:grid-cols-2">
+                {upcoming.map((bill) => (
+                  <li key={bill.id} className="flex items-center justify-between gap-3 text-sm">
+                    <span className="min-w-0 truncate">
+                      <span className="font-medium text-slate-900">{bill.name}</span>{' '}
+                      <span className="text-slate-500">&middot; {dueLabel(bill.daysUntilDue, bill.nextDueOn)}</span>
+                    </span>
+                    <span className="shrink-0 tabular-nums text-slate-900">
+                      {bill.amountVaries ? 'about ' : ''}
+                      {formatPaise(bill.amountPaise)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
 
           <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
             <h2 className="text-lg font-semibold text-slate-900">Income and spending, last 12 months</h2>
