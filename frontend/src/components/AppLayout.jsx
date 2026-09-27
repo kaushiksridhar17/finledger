@@ -5,6 +5,7 @@ const NAV_ITEMS = [
   { to: '/', label: 'Dashboard', end: true },
   { to: '/transactions', label: 'Transactions' },
   { to: '/accounts', label: 'Accounts' },
+  { to: '/import', label: 'Import' },
 ]
 
 // Header and navigation shared by every logged-in page. The current page renders in <Outlet />.

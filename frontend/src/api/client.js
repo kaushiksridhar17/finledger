@@ -48,16 +48,22 @@ async function readBody(response) {
   }
 }
 
+// body can be a plain object (sent as JSON) or FormData (a file upload; the browser sets its own Content-Type)
 async function send(path, { method = 'GET', body, auth = true } = {}) {
+  const isForm = body instanceof FormData
   const headers = {}
-  if (body !== undefined) headers['Content-Type'] = 'application/json'
+  if (body !== undefined && !isForm) headers['Content-Type'] = 'application/json'
   if (auth && accessToken) headers.Authorization = `Bearer ${accessToken}`
+
+  let payload
+  if (isForm) payload = body
+  else if (body !== undefined) payload = JSON.stringify(body)
 
   try {
     return await fetch(`/api${path}`, {
       method,
       headers,
-      body: body !== undefined ? JSON.stringify(body) : undefined,
+      body: payload,
       credentials: 'same-origin',
     })
   } catch {
