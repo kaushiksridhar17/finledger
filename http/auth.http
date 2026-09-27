@@ -1,0 +1,37 @@
+@baseUrl = http://localhost:8080
+
+### 1. Register a new user (expect 201 Created)
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Arjun Mehta",
+  "email": "Arjun@Example.com",
+  "password": "password123"
+}
+
+### 2. Same email again, different capitals (expect 409 Conflict)
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Arjun Again",
+  "email": "arjun@example.com",
+  "password": "password123"
+}
+
+### 3. Bad input (expect 400 with a list of errors)
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "",
+  "email": "not-an-email",
+  "password": "short"
+}
+
+### 4. Broken JSON (expect 400)
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{ "name": "Arjun"
