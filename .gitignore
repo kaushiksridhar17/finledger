@@ -20,3 +20,6 @@ Thumbs.db
 
 # Real bank statements used for private testing
 samples/private/
+
+# Downloaded step zips
+*.zip

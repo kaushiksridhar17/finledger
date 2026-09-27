@@ -39,6 +39,10 @@ public class UserSession {
     @Column(name = "refresh_token_hash", nullable = false, length = 64)
     private String refreshTokenHash;
 
+    // The secret that was just replaced. Accepted briefly so simultaneous refreshes from two tabs don't clash.
+    @Column(name = "previous_refresh_token_hash", length = 64)
+    private String previousRefreshTokenHash;
+
     @Column(name = "user_agent", length = 255)
     private String userAgent;
 
@@ -47,6 +51,9 @@ public class UserSession {
 
     @Column(name = "last_used_at", nullable = false)
     private Instant lastUsedAt;
+
+    @Column(name = "rotated_at")
+    private Instant rotatedAt;
 
     @Column(name = "expires_at", nullable = false)
     private Instant expiresAt;

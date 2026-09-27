@@ -14,12 +14,17 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ApiExceptionHandler {
 
-    // Our own errors, e.g. "email already registered"
-    @ExceptionHandler(ApiException.class)
-    public ProblemDetail handleApiException(ApiException ex) {
+    /** Builds the JSON error body for an ApiException. Also used directly by controllers that add headers. */
+    public static ProblemDetail toProblem(ApiException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(ex.getStatus(), ex.getMessage());
         problem.setTitle(ex.getStatus().getReasonPhrase());
         return problem;
+    }
+
+    // Our own errors, e.g. "email already registered"
+    @ExceptionHandler(ApiException.class)
+    public ProblemDetail handleApiException(ApiException ex) {
+        return toProblem(ex);
     }
 
     // @Valid failed: return every bad field with its message so the form can show them

@@ -74,3 +74,12 @@ GET {{baseUrl}}/api/users/me
 ### 10. Who am I, with a fake token (expect 401)
 GET {{baseUrl}}/api/users/me
 Authorization: Bearer this.is.fake
+
+### 11. Refresh (REST Client resends the cookie from request 5 automatically; expect 200 and a new Set-Cookie)
+POST {{baseUrl}}/api/auth/refresh
+
+### 12. Log out (expect 204 and a Set-Cookie that clears the cookie)
+POST {{baseUrl}}/api/auth/logout
+
+### 13. Refresh after logout (expect 401)
+POST {{baseUrl}}/api/auth/refresh
