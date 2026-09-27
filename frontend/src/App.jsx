@@ -1,17 +1,22 @@
-import { Navigate, Route, Routes } from 'react-router'
+import { lazy } from 'react'
+import { Route, Routes } from 'react-router'
 import RequireAuth from './auth/RequireAuth.jsx'
 import AppLayout from './components/AppLayout.jsx'
-import AccountsPage from './pages/AccountsPage.jsx'
-import BudgetsPage from './pages/BudgetsPage.jsx'
-import DashboardPage from './pages/DashboardPage.jsx'
-import GroupPage from './pages/GroupPage.jsx'
-import ImportPage from './pages/ImportPage.jsx'
-import InvestmentsPage from './pages/InvestmentsPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
-import RecurringPage from './pages/RecurringPage.jsx'
+import NotFoundPage from './pages/NotFoundPage.jsx'
 import RegisterPage from './pages/RegisterPage.jsx'
-import SplitPage from './pages/SplitPage.jsx'
-import TransactionsPage from './pages/TransactionsPage.jsx'
+
+// Each page is its own file in the build and only downloads when it's first opened.
+// The chart library comes with the Dashboard and Investments pages, so logging in doesn't wait for it.
+const AccountsPage = lazy(() => import('./pages/AccountsPage.jsx'))
+const BudgetsPage = lazy(() => import('./pages/BudgetsPage.jsx'))
+const DashboardPage = lazy(() => import('./pages/DashboardPage.jsx'))
+const GroupPage = lazy(() => import('./pages/GroupPage.jsx'))
+const ImportPage = lazy(() => import('./pages/ImportPage.jsx'))
+const InvestmentsPage = lazy(() => import('./pages/InvestmentsPage.jsx'))
+const RecurringPage = lazy(() => import('./pages/RecurringPage.jsx'))
+const SplitPage = lazy(() => import('./pages/SplitPage.jsx'))
+const TransactionsPage = lazy(() => import('./pages/TransactionsPage.jsx'))
 
 function App() {
   return (
@@ -37,9 +42,8 @@ function App() {
         <Route path="investments" element={<InvestmentsPage />} />
         <Route path="accounts" element={<AccountsPage />} />
         <Route path="import" element={<ImportPage />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Route>
-
-      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
 }

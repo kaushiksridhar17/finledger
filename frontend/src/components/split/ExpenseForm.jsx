@@ -168,7 +168,7 @@ export default function ExpenseForm({ group, expense, onClose, onSaved }) {
             ))}
           </div>
 
-          <ul className="mt-3 divide-y divide-slate-100 rounded-lg ring-1 ring-slate-200">
+          <ul className="mt-3 divide-y divide-slate-100 rounded-lg border border-slate-200">
             {people.map((person) => (
               <li key={person.memberId} className="flex items-center justify-between gap-3 px-3 py-2">
                 {form.splitType === 'EQUAL' ? (
@@ -226,7 +226,7 @@ export default function ExpenseForm({ group, expense, onClose, onSaved }) {
           <button
             type="submit"
             disabled={busy}
-            className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-60"
+            className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800 disabled:opacity-60"
           >
             {busy ? 'Saving...' : editing ? 'Save changes' : 'Add expense'}
           </button>

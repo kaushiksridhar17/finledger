@@ -63,12 +63,11 @@ export default function LoginPage() {
 
   return (
     <AuthLayout
-      title="Welcome back"
-      subtitle="Log in to see your money in one place."
+      title="Log in"
       footer={
         <>
           New here?{' '}
-          <Link to="/register" className="font-medium text-emerald-600 hover:text-emerald-700">
+          <Link to="/register" className="font-medium text-emerald-700 hover:text-emerald-800">
             Create an account
           </Link>
         </>
@@ -100,7 +99,7 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={busy}
-          className="w-full rounded-lg bg-emerald-600 px-4 py-2.5 font-medium text-white hover:bg-emerald-700 disabled:opacity-60"
+          className="w-full rounded-lg bg-emerald-700 px-4 py-2.5 font-medium text-white hover:bg-emerald-800 disabled:opacity-60"
         >
           {submitting ? 'Logging in...' : 'Log in'}
         </button>
@@ -116,12 +115,12 @@ export default function LoginPage() {
         type="button"
         onClick={handleDemo}
         disabled={busy}
-        className="w-full rounded-lg px-4 py-2.5 font-medium text-slate-800 ring-1 ring-slate-300 hover:bg-slate-50 disabled:opacity-60"
+        className="w-full rounded-lg px-4 py-2.5 font-medium text-slate-800 border border-slate-300 hover:bg-slate-50 disabled:opacity-60"
       >
-        {startingDemo ? 'Setting up your demo...' : 'Try the demo'}
+        {startingDemo ? 'Loading the demo...' : 'Try the demo'}
       </button>
       <p className="mt-2 text-center text-xs text-slate-500">
-        A private sample account with a year of transactions. No sign-up needed.
+        Opens a throwaway account with a year of sample data.
       </p>
     </AuthLayout>
   )

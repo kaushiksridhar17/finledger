@@ -14,7 +14,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import com.jayway.jsonpath.JsonPath;
 
-/** Small helpers shared by the phase 5 integration tests: sign up, create accounts and transactions, read JSON. */
+/** Small helpers shared by the integration tests: sign up, create accounts and transactions, read JSON. */
 public final class ApiTestClient {
 
     private final MockMvc mockMvc;

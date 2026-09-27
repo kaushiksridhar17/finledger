@@ -57,14 +57,14 @@ export default function ActivityList({ group, onEditExpense, onChanged, onError 
 
   if (items.length === 0) {
     return (
-      <div className="rounded-2xl bg-white p-8 text-center text-slate-600 shadow-sm ring-1 ring-slate-200">
-        No expenses yet. Add the first one, like the cab from the airport.
+      <div className="rounded-lg bg-white p-8 text-center text-slate-600 border border-slate-200">
+        No expenses yet.
       </div>
     )
   }
 
   return (
-    <ul className="divide-y divide-slate-100 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
+    <ul className="divide-y divide-slate-100 overflow-hidden rounded-lg bg-white border border-slate-200">
       {items.map(({ kind, key, date, item }) =>
         kind === 'expense' ? (
           <li key={key}>

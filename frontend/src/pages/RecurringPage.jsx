@@ -70,15 +70,14 @@ export default function RecurringPage() {
         <div>
           <h1 className="text-2xl font-semibold text-slate-900">Bills and subscriptions</h1>
           <p className="mt-1 text-slate-500">
-            Repeating payments found in your transactions. Confirm the ones you want reminders for, 3 days before
-            they're due.
+            Payments that repeat in your transactions. Confirmed bills get a reminder 3 days before they're due.
           </p>
         </div>
         <button
           type="button"
           onClick={scan}
           disabled={scanning}
-          className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-60"
+          className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800 disabled:opacity-60"
         >
           {scanning ? 'Scanning...' : 'Scan now'}
         </button>
@@ -90,14 +89,13 @@ export default function RecurringPage() {
       {!data && !error && <p className="text-slate-500">Loading...</p>}
 
       {data && items.length === 0 && (
-        <div className="rounded-2xl bg-white p-8 text-center text-slate-600 shadow-sm ring-1 ring-slate-200">
-          Nothing repeating found yet. Once you've a few months of transactions, subscriptions like Netflix and bills
-          like rent show up here.
+        <div className="rounded-lg bg-white p-8 text-center text-slate-600 border border-slate-200">
+          Nothing found yet. This needs at least three months of transactions.
         </div>
       )}
 
       {suggested.length > 0 && (
-        <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-sky-200">
+        <section className="rounded-lg bg-white p-6 shadow-sm border border-sky-200">
           <h2 className="text-lg font-semibold text-slate-900">Found in your transactions</h2>
           <p className="text-sm text-slate-500">Are these regular payments?</p>
           <ul className="mt-2 divide-y divide-slate-100">
@@ -106,14 +104,14 @@ export default function RecurringPage() {
                 <button
                   type="button"
                   onClick={() => act(confirmRecurring, item.id)}
-                  className={`${buttonClass} bg-emerald-600 text-white hover:bg-emerald-700`}
+                  className={`${buttonClass} bg-emerald-700 text-white hover:bg-emerald-800`}
                 >
                   Yes, track it
                 </button>
                 <button
                   type="button"
                   onClick={() => act(dismissRecurring, item.id)}
-                  className={`${buttonClass} text-slate-600 ring-1 ring-slate-300 hover:bg-slate-100`}
+                  className={`${buttonClass} text-slate-600 border border-slate-300 hover:bg-slate-100`}
                 >
                   No
                 </button>
@@ -124,7 +122,7 @@ export default function RecurringPage() {
       )}
 
       {bills.length > 0 && (
-        <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+        <section className="rounded-lg bg-white p-6 border border-slate-200">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <h2 className="text-lg font-semibold text-slate-900">Your bills and subscriptions</h2>
             <p className="text-sm text-slate-600">
@@ -149,7 +147,7 @@ export default function RecurringPage() {
       )}
 
       {income.length > 0 && (
-        <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+        <section className="rounded-lg bg-white p-6 border border-slate-200">
           <h2 className="text-lg font-semibold text-slate-900">Regular income</h2>
           <ul className="mt-2 divide-y divide-slate-100">
             {income.map((item) => (
@@ -168,7 +166,7 @@ export default function RecurringPage() {
       )}
 
       {dismissed.length > 0 && (
-        <details className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+        <details className="rounded-lg bg-white p-6 border border-slate-200">
           <summary className="cursor-pointer text-sm font-medium text-slate-600">
             Not tracked ({dismissed.length})
           </summary>

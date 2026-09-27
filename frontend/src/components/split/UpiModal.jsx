@@ -28,7 +28,7 @@ export default function UpiModal({ title, payee, amountPaise, note, instructions
           to {payee.name} &middot; <span className="font-mono">{payee.upiId}</span>
         </p>
 
-        <div className="mt-4 rounded-xl bg-white p-3 ring-1 ring-slate-200">
+        <div className="mt-4 rounded-md bg-white p-3 border border-slate-200">
           <QRCodeSVG value={link} size={176} marginSize={1} title={`UPI QR code for ${formatPaise(amountPaise)}`} />
         </div>
         <p className="mt-3 max-w-sm text-sm text-slate-600">{instructions}</p>
@@ -36,14 +36,14 @@ export default function UpiModal({ title, payee, amountPaise, note, instructions
         <div className="mt-4 flex flex-wrap justify-center gap-2">
           <a
             href={link}
-            className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+            className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800"
           >
             Open UPI app
           </a>
           <button
             type="button"
             onClick={copy}
-            className="rounded-lg px-4 py-2 text-sm font-medium text-slate-700 ring-1 ring-slate-300 hover:bg-slate-100"
+            className="rounded-lg px-4 py-2 text-sm font-medium text-slate-700 border border-slate-300 hover:bg-slate-100"
           >
             {copied ? 'Link copied' : 'Copy link'}
           </button>

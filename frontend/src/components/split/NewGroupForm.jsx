@@ -53,7 +53,7 @@ export default function NewGroupForm({ onClose, onCreated }) {
         <div>
           <p className="text-sm font-medium text-slate-700">Friends</p>
           <p className="text-xs text-slate-500">
-            They don't need a FinLedger account. A UPI ID is optional; with one you get a "Pay with UPI" button.
+            They don't need an account here. Add a UPI ID if you want to pay them from the app.
           </p>
           <div className="mt-2 space-y-2">
             {friends.map((friend, index) => (
@@ -90,7 +90,7 @@ export default function NewGroupForm({ onClose, onCreated }) {
           <button
             type="submit"
             disabled={busy}
-            className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-60"
+            className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800 disabled:opacity-60"
           >
             {busy ? 'Creating...' : 'Create group'}
           </button>

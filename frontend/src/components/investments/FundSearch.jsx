@@ -39,7 +39,7 @@ export default function FundSearch({ initialQuery = '', selected, onSelect }) {
   if (selected) {
     const { fund, plan } = splitFundName(selected.name)
     return (
-      <div className="flex items-start justify-between gap-3 rounded-lg bg-emerald-50 px-3 py-2 ring-1 ring-emerald-200">
+      <div className="flex items-start justify-between gap-3 rounded-lg bg-emerald-50 px-3 py-2 border border-emerald-200">
         <div className="min-w-0">
           <p className="font-medium text-slate-900">{fund}</p>
           <p className="text-xs text-slate-600">
@@ -70,7 +70,7 @@ export default function FundSearch({ initialQuery = '', selected, onSelect }) {
         <p className="mt-1 text-sm text-slate-500">No funds match. Try fewer words, like "parag flexi".</p>
       )}
       {trimmed.length >= 3 && results.length > 0 && (
-        <ul className="mt-2 max-h-56 divide-y divide-slate-100 overflow-y-auto rounded-lg ring-1 ring-slate-200" aria-label="Matching funds">
+        <ul className="mt-2 max-h-56 divide-y divide-slate-100 overflow-y-auto rounded-lg border border-slate-200" aria-label="Matching funds">
           {results.map((hit) => {
             const { fund, plan } = splitFundName(hit.name)
             return (

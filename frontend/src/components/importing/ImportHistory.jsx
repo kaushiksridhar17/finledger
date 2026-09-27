@@ -1,23 +1,20 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
 import { getImport } from '../../api/imports.js'
+import { formatDateTime } from '../../lib/dates.js'
 
 const STATUS = {
   QUEUED: { label: 'Waiting', className: 'bg-slate-100 text-slate-700' },
-  PROCESSING: { label: 'Importing...', className: 'bg-sky-50 text-sky-800 ring-1 ring-sky-200' },
-  COMPLETED: { label: 'Done', className: 'bg-emerald-50 text-emerald-800 ring-1 ring-emerald-200' },
-  FAILED: { label: 'Failed', className: 'bg-rose-50 text-rose-800 ring-1 ring-rose-200' },
+  PROCESSING: { label: 'Importing...', className: 'bg-sky-50 text-sky-800 border border-sky-200' },
+  COMPLETED: { label: 'Done', className: 'bg-emerald-50 text-emerald-800 border border-emerald-200' },
+  FAILED: { label: 'Failed', className: 'bg-rose-50 text-rose-800 border border-rose-200' },
 }
 
 const FORMAT_NAMES = { HDFC: 'HDFC', ICICI: 'ICICI', SBI: 'SBI', TEMPLATE: 'FinLedger template' }
 
-function formatTime(iso) {
-  return new Date(iso).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' })
-}
-
 export default function ImportHistory({ imports }) {
   if (imports.length === 0) {
-    return <p className="text-slate-500">No imports yet. Upload a statement above.</p>
+    return <p className="text-slate-500">No imports yet.</p>
   }
 
   return (
@@ -51,7 +48,7 @@ function ImportRow({ item }) {
         <div className="min-w-0">
           <p className="truncate font-medium text-slate-900">{item.fileName}</p>
           <p className="text-xs text-slate-500">
-            {item.accountName} &middot; {formatTime(item.createdAt)}
+            {item.accountName} &middot; {formatDateTime(item.createdAt)}
             {item.bankFormat && <> &middot; {FORMAT_NAMES[item.bankFormat] ?? item.bankFormat} format</>}
           </p>
         </div>
@@ -75,7 +72,7 @@ function ImportRow({ item }) {
             <>
               {' '}
               &middot;{' '}
-              <Link to="/transactions" className="font-medium text-emerald-600 hover:text-emerald-700">
+              <Link to="/transactions" className="font-medium text-emerald-700 hover:text-emerald-800">
                 View transactions
               </Link>
             </>

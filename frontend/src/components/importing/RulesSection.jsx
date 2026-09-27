@@ -69,8 +69,8 @@ export default function RulesSection({ categories }) {
   return (
     <div className="space-y-4">
       <p className="text-sm text-slate-600">
-        FinLedger already knows common merchants like Swiggy, Uber and Netflix. Add your own rules for the rest. They
-        apply to future imports and are checked before the built-in ones, oldest first.
+        Common merchants like Swiggy, Uber and Netflix are recognised already. Your own rules apply to future
+        imports and are checked first, oldest first.
       </p>
 
       <ErrorBanner message={error} />
@@ -116,7 +116,7 @@ export default function RulesSection({ categories }) {
       {rules && rules.length === 0 && <p className="text-sm text-slate-500">No rules yet.</p>}
 
       {rules && rules.length > 0 && (
-        <ul className="divide-y divide-slate-100 rounded-lg ring-1 ring-slate-200">
+        <ul className="divide-y divide-slate-100 rounded-lg border border-slate-200">
           {rules.map((rule) => (
             <li key={rule.id} className="flex items-center justify-between gap-3 px-3 py-2 text-sm">
               <span className="text-slate-700">

@@ -4,7 +4,7 @@ import { formatPaise, paiseToInput, parseRupeesToPaise } from '../../lib/money.j
 
 // Status is always shown as words next to the colour, never by colour alone
 const STATUS = {
-  ON_TRACK: { bar: 'bg-emerald-600', text: 'text-emerald-800', label: 'On track' },
+  ON_TRACK: { bar: 'bg-emerald-700', text: 'text-emerald-800', label: 'On track' },
   NEAR_LIMIT: { bar: 'bg-amber-400', text: 'text-amber-800', label: 'Almost at the limit' },
   OVER: { bar: 'bg-rose-600', text: 'text-rose-700', label: 'Over budget' },
 }
@@ -49,7 +49,7 @@ export default function BudgetCard({ budget, editable, onChanged }) {
   }
 
   return (
-    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+    <div className="rounded-lg bg-white p-5 border border-slate-200">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="flex items-center gap-2 font-semibold text-slate-900">
@@ -111,7 +111,7 @@ export default function BudgetCard({ budget, editable, onChanged }) {
             onChange={(e) => setLimit(e.target.value)}
             className="w-28 rounded-lg border border-slate-300 px-2 py-1.5 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
           />
-          <button type="submit" disabled={busy} className="rounded-lg bg-emerald-600 px-3 py-1.5 font-medium text-white disabled:opacity-60">
+          <button type="submit" disabled={busy} className="rounded-lg bg-emerald-700 px-3 py-1.5 font-medium text-white disabled:opacity-60">
             Save
           </button>
           <button type="button" onClick={() => setEditing(false)} className="px-2 py-1.5 text-slate-600">

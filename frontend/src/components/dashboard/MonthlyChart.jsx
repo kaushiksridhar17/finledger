@@ -111,7 +111,7 @@ function MonthTooltip({ active, payload }) {
   const saved = row.incomePaise - row.spendingPaise
 
   return (
-    <div className="rounded-lg bg-white px-3 py-2 text-sm shadow-lg ring-1 ring-slate-200">
+    <div className="rounded-lg bg-white px-3 py-2 text-sm shadow-lg border border-slate-200">
       <p className="font-medium text-slate-900">{formatMonth(row.month)}</p>
       <TooltipRow color={INCOME_COLOR} label="Income" value={formatPaise(row.incomePaise)} />
       <TooltipRow color={SPENDING_COLOR} label="Spending" value={formatPaise(row.spendingPaise)} />

@@ -62,7 +62,7 @@ export default function BudgetsPage() {
         <div>
           <h1 className="text-2xl font-semibold text-slate-900">Budgets</h1>
           <p className="mt-1 text-slate-500">
-            Monthly limits per category. You'll get a notification at 80% and if you go over.
+            Monthly limits by category. You're notified at 80% and again if you go over.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -70,7 +70,7 @@ export default function BudgetsPage() {
             type="button"
             onClick={() => setMonth((m) => shiftMonth(m, -1))}
             aria-label="Previous month"
-            className="rounded-lg px-3 py-1.5 text-slate-600 ring-1 ring-slate-300 hover:bg-slate-100"
+            className="rounded-lg px-3 py-1.5 text-slate-600 border border-slate-300 hover:bg-slate-100"
           >
             &lsaquo;
           </button>
@@ -80,14 +80,14 @@ export default function BudgetsPage() {
             onClick={() => setMonth((m) => shiftMonth(m, 1))}
             disabled={isThisMonth}
             aria-label="Next month"
-            className="rounded-lg px-3 py-1.5 text-slate-600 ring-1 ring-slate-300 hover:bg-slate-100 disabled:opacity-40"
+            className="rounded-lg px-3 py-1.5 text-slate-600 border border-slate-300 hover:bg-slate-100 disabled:opacity-40"
           >
             &rsaquo;
           </button>
           <button
             type="button"
             onClick={() => setAdding(true)}
-            className="ml-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+            className="ml-2 rounded-lg bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800"
           >
             Add budget
           </button>
@@ -99,8 +99,8 @@ export default function BudgetsPage() {
       {!budgets && !error && <p className="text-slate-500">Loading...</p>}
 
       {budgets && budgets.length === 0 && (
-        <div className="rounded-2xl bg-white p-8 text-center text-slate-600 shadow-sm ring-1 ring-slate-200">
-          No budgets yet. Add one for a category you'd like to keep an eye on, like Food &amp; Dining.
+        <div className="rounded-lg bg-white p-8 text-center text-slate-600 border border-slate-200">
+          No budgets yet.
         </div>
       )}
 

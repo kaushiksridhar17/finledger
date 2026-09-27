@@ -42,7 +42,7 @@ export default function LinkSipForm({ suggestion, onClose, onSaved }) {
           <p className="mb-1 text-sm font-medium text-slate-700">Which fund is it?</p>
           <FundSearch initialQuery={suggestion.suggestedQuery} selected={selected} onSelect={setSelected} />
           <p className="mt-1 text-xs text-slate-500">
-            Pick the exact plan your SIP is in: Direct or Regular, Growth or IDCW. It's on your fund statement.
+            Check the plan (Direct or Regular, Growth or IDCW) against your fund statement.
           </p>
         </div>
         <div className="flex justify-end">
@@ -50,7 +50,7 @@ export default function LinkSipForm({ suggestion, onClose, onSaved }) {
             type="button"
             onClick={handleLink}
             disabled={busy}
-            className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-60"
+            className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800 disabled:opacity-60"
           >
             {busy ? 'Linking...' : 'Link and add purchases'}
           </button>

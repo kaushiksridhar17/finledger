@@ -12,7 +12,7 @@ const SHOWN_TRANSACTIONS = 12
 
 function Tile({ label, value, note, tone = 'text-slate-900' }) {
   return (
-    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+    <div className="rounded-lg bg-white p-5 border border-slate-200">
       <p className="text-sm text-slate-500">{label}</p>
       <p className={`mt-1 text-2xl font-semibold tabular-nums ${tone}`}>{value}</p>
       {note && <p className="mt-1 text-xs text-slate-500">{note}</p>}
@@ -96,9 +96,7 @@ export default function InvestmentsPage() {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold text-slate-900">Investments</h1>
-          <p className="mt-1 text-slate-500">
-            Your mutual funds, valued at the latest NAV from AMFI (via mfapi.in), with your real yearly return.
-          </p>
+          <p className="mt-1 text-slate-500">Mutual funds, valued at the latest NAV.</p>
         </div>
         <div className="flex gap-2">
           {hasFunds && (
@@ -106,7 +104,7 @@ export default function InvestmentsPage() {
               type="button"
               onClick={refresh}
               disabled={refreshing}
-              className="rounded-lg px-4 py-2 text-sm font-medium text-slate-700 ring-1 ring-slate-300 hover:bg-slate-100 disabled:opacity-60"
+              className="rounded-lg px-4 py-2 text-sm font-medium text-slate-700 border border-slate-300 hover:bg-slate-100 disabled:opacity-60"
             >
               {refreshing ? 'Refreshing...' : 'Refresh prices'}
             </button>
@@ -114,7 +112,7 @@ export default function InvestmentsPage() {
           <button
             type="button"
             onClick={() => setDialog({ type: 'trade', fund: null })}
-            className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+            className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800"
           >
             Add purchase
           </button>
@@ -137,14 +135,12 @@ export default function InvestmentsPage() {
       )}
 
       {suggestions.length > 0 && (
-        <section className="rounded-2xl bg-sky-50 p-5 ring-1 ring-sky-200" aria-label="SIPs found in your bank transactions">
+        <section className="rounded-lg bg-sky-50 p-5 border border-sky-200" aria-label="SIPs found in your bank transactions">
           <h2 className="font-semibold text-slate-900">SIPs found in your bank transactions</h2>
-          <p className="text-sm text-slate-600">
-            Link each one to its fund and every instalment, past and future, is added as a purchase.
-          </p>
+          <p className="text-sm text-slate-600">Link one to its fund to add every instalment as a purchase.</p>
           <ul className="mt-3 space-y-2">
             {suggestions.map((s) => (
-              <li key={s.matchKey} className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-white px-4 py-3 ring-1 ring-sky-100">
+              <li key={s.matchKey} className="flex flex-wrap items-center justify-between gap-3 rounded-md bg-white px-4 py-3 border border-sky-100">
                 <div className="min-w-0">
                   <p className="truncate font-mono text-xs text-slate-700">{s.label}</p>
                   <p className="text-sm text-slate-600">
@@ -154,7 +150,7 @@ export default function InvestmentsPage() {
                 <button
                   type="button"
                   onClick={() => setDialog({ type: 'link', suggestion: s })}
-                  className="rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-700"
+                  className="rounded-lg bg-emerald-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-800"
                 >
                   Link to a fund
                 </button>
@@ -165,8 +161,8 @@ export default function InvestmentsPage() {
       )}
 
       {portfolio && !hasFunds && suggestions.length === 0 && (
-        <div className="rounded-2xl bg-white p-8 text-center text-slate-600 shadow-sm ring-1 ring-slate-200">
-          No mutual funds yet. Add a purchase, or import a bank statement: monthly SIP debits are spotted automatically.
+        <div className="rounded-lg bg-white p-8 text-center text-slate-600 border border-slate-200">
+          No funds yet. Add a purchase, or import a bank statement and any SIPs in it will show up here.
         </div>
       )}
 
@@ -184,13 +180,13 @@ export default function InvestmentsPage() {
             <Tile
               label="Yearly return (XIRR)"
               value={formatRate(portfolio.xirr)}
-              note={portfolio.xirr === null ? 'Shown once money has been in for a month' : 'Allows for when each rupee went in'}
+              note={portfolio.xirr === null ? 'Needs at least a month of history' : 'Annualised return'}
               tone={gainTone(portfolio.xirr ?? 0)}
             />
           </div>
 
           {portfolio.history.length > 1 && (
-            <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+            <section className="rounded-lg bg-white p-6 border border-slate-200">
               <h2 className="text-lg font-semibold text-slate-900">Value over the last year</h2>
               <p className="text-sm text-slate-500">Month-end value against the money you'd put in by then.</p>
               <div className="mt-4">
@@ -206,13 +202,13 @@ export default function InvestmentsPage() {
                 const { fund: fundName, plan } = splitFundName(fund.name)
                 const share = portfolio.valuePaise > 0 ? (fund.valuePaise / portfolio.valuePaise) * 100 : 0
                 return (
-                  <li key={fund.schemeCode} className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+                  <li key={fund.schemeCode} className="rounded-lg bg-white p-5 border border-slate-200">
                     <div className="flex flex-wrap items-start justify-between gap-4">
                       <div className="min-w-0">
                         <p className="font-semibold text-slate-900">
                           {fundName}
                           {fund.sip && (
-                            <span className="ml-2 rounded-full bg-sky-50 px-2 py-0.5 align-middle text-xs font-medium text-sky-800 ring-1 ring-sky-200">
+                            <span className="ml-2 rounded-full bg-sky-50 px-2 py-0.5 align-middle text-xs font-medium text-sky-800 border border-sky-200">
                               SIP
                             </span>
                           )}
@@ -260,9 +256,9 @@ export default function InvestmentsPage() {
       )}
 
       {portfolio && portfolio.sips.length > 0 && (
-        <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+        <section className="rounded-lg bg-white p-5 border border-slate-200">
           <h2 className="font-semibold text-slate-900">Linked SIPs</h2>
-          <p className="text-sm text-slate-500">New debits like these become purchases automatically after each import.</p>
+          <p className="text-sm text-slate-500">Matching debits in future imports are added as purchases.</p>
           <ul className="mt-2 divide-y divide-slate-100">
             {portfolio.sips.map((sip) => (
               <li key={sip.id} className="flex flex-wrap items-center justify-between gap-3 py-2.5">
@@ -289,7 +285,7 @@ export default function InvestmentsPage() {
       )}
 
       {transactions.length > 0 && (
-        <section className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
+        <section className="overflow-hidden rounded-lg bg-white border border-slate-200">
           <h2 className="px-5 pt-5 font-semibold text-slate-900">Purchases and redemptions</h2>
           <div className="overflow-x-auto">
             <table className="mt-3 w-full min-w-[640px] text-left text-sm">

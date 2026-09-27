@@ -96,14 +96,14 @@ export default function TransactionsPage() {
           type="button"
           onClick={() => setEditing(null)}
           disabled={noAccounts}
-          className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
+          className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800 disabled:opacity-50"
         >
           Add transaction
         </button>
       </div>
 
       {noAccounts && result && (
-        <div className="rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800 ring-1 ring-amber-200">
+        <div className="rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800 border border-amber-200">
           You need an account before adding transactions.{' '}
           <Link to="/accounts" className="font-medium underline">
             Add one on the Accounts page
@@ -114,7 +114,7 @@ export default function TransactionsPage() {
 
       <form
         onSubmit={applyFilters}
-        className="grid gap-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:grid-cols-2 lg:grid-cols-6"
+        className="grid gap-3 rounded-lg bg-white p-4 border border-slate-200 sm:grid-cols-2 lg:grid-cols-6"
       >
         <input
           name="q"
@@ -151,7 +151,7 @@ export default function TransactionsPage() {
           <button
             type="button"
             onClick={clearFilters}
-            className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 ring-1 ring-slate-300 hover:bg-slate-100"
+            className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 border border-slate-300 hover:bg-slate-100"
           >
             Clear
           </button>
@@ -171,13 +171,13 @@ export default function TransactionsPage() {
       {!result && !error && <p className="text-slate-500">Loading...</p>}
 
       {result && result.items.length === 0 && (
-        <div className="rounded-2xl bg-white p-8 text-center text-slate-600 shadow-sm ring-1 ring-slate-200">
+        <div className="rounded-lg bg-white p-8 text-center text-slate-600 border border-slate-200">
           No transactions match.
         </div>
       )}
 
       {result && result.items.length > 0 && (
-        <div className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
+        <div className="overflow-hidden rounded-lg bg-white border border-slate-200">
           <ul className="divide-y divide-slate-100">
             {result.items.map((t) => (
               <li key={t.id}>
@@ -197,7 +197,7 @@ export default function TransactionsPage() {
                   <CategoryChip name={t.categoryName} color={t.categoryColor} />
                   <span
                     className={`w-32 shrink-0 text-right font-semibold ${
-                      t.amountPaise > 0 ? 'text-emerald-600' : 'text-slate-900'
+                      t.amountPaise > 0 ? 'text-emerald-700' : 'text-slate-900'
                     }`}
                   >
                     {t.amountPaise > 0 ? '+' : ''}
@@ -217,7 +217,7 @@ export default function TransactionsPage() {
                 type="button"
                 onClick={() => setPage((p) => p - 1)}
                 disabled={result.page === 0}
-                className="rounded-lg px-3 py-1.5 ring-1 ring-slate-300 hover:bg-slate-100 disabled:opacity-40"
+                className="rounded-lg px-3 py-1.5 border border-slate-300 hover:bg-slate-100 disabled:opacity-40"
               >
                 Previous
               </button>
@@ -225,7 +225,7 @@ export default function TransactionsPage() {
                 type="button"
                 onClick={() => setPage((p) => p + 1)}
                 disabled={result.page + 1 >= result.totalPages}
-                className="rounded-lg px-3 py-1.5 ring-1 ring-slate-300 hover:bg-slate-100 disabled:opacity-40"
+                className="rounded-lg px-3 py-1.5 border border-slate-300 hover:bg-slate-100 disabled:opacity-40"
               >
                 Next
               </button>

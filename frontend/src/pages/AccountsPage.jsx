@@ -52,7 +52,7 @@ export default function AccountsPage() {
         <button
           type="button"
           onClick={() => setEditing(null)}
-          className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+          className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800"
         >
           Add account
         </button>
@@ -63,8 +63,8 @@ export default function AccountsPage() {
       {!accounts && !error && <p className="text-slate-500">Loading...</p>}
 
       {accounts && accounts.length === 0 && (
-        <div className="rounded-2xl bg-white p-8 text-center shadow-sm ring-1 ring-slate-200">
-          <p className="text-slate-600">No accounts yet. Add your bank account, cash or credit card to get started.</p>
+        <div className="rounded-lg bg-white p-8 text-center border border-slate-200">
+          <p className="text-slate-600">No accounts yet. Add a bank account, card, wallet or cash.</p>
         </div>
       )}
 
@@ -90,7 +90,7 @@ function AccountGrid({ accounts, onEdit }) {
           key={account.id}
           type="button"
           onClick={() => onEdit(account)}
-          className={`rounded-2xl bg-white p-5 text-left shadow-sm ring-1 ring-slate-200 hover:ring-emerald-300 ${
+          className={`rounded-lg bg-white p-5 text-left border border-slate-200 hover:ring-emerald-300 ${
             account.archived ? 'opacity-60' : ''
           }`}
         >

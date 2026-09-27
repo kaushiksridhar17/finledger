@@ -84,7 +84,7 @@ function PointTooltip({ active, payload }) {
   if (!active || !payload?.length) return null
   const row = payload[0].payload
   return (
-    <div className="rounded-lg bg-white px-3 py-2 text-sm shadow-lg ring-1 ring-slate-200">
+    <div className="rounded-lg bg-white px-3 py-2 text-sm shadow-lg border border-slate-200">
       <p className="font-medium text-slate-900">{formatDate(row.date)}</p>
       <TooltipRow color={VALUE_COLOR} label="Value" value={formatPaise(row.valuePaise)} />
       <TooltipRow color={INVESTED_COLOR} label="Invested" value={formatPaise(row.investedPaise)} dashed />

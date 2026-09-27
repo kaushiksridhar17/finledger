@@ -13,7 +13,7 @@ export default function PeopleCard({ group, onChanged, onEdit, onAdd, onError })
   }
 
   return (
-    <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+    <section className="rounded-lg bg-white p-5 border border-slate-200">
       <div className="flex items-center justify-between">
         <h2 className="font-semibold text-slate-900">People</h2>
         <button type="button" onClick={onAdd} className="text-sm font-medium text-emerald-700 hover:text-emerald-800">

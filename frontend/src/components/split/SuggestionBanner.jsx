@@ -17,7 +17,7 @@ export default function SuggestionBanner({ group, onChanged, onError }) {
   return (
     <section className="space-y-2" aria-label="Possible repayments">
       {group.suggestions.map((s) => (
-        <div key={s.id} className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-sky-50 px-4 py-3 ring-1 ring-sky-200">
+        <div key={s.id} className="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-sky-50 px-4 py-3 border border-sky-200">
           <div className="min-w-0">
             <p className="font-medium text-slate-900">
               {s.memberName} may have paid you back {formatPaise(s.amountPaise)}
@@ -30,14 +30,14 @@ export default function SuggestionBanner({ group, onChanged, onError }) {
             <button
               type="button"
               onClick={() => act(acceptMatch, s.id)}
-              className="rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-700"
+              className="rounded-lg bg-emerald-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-800"
             >
               Yes, record it
             </button>
             <button
               type="button"
               onClick={() => act(dismissMatch, s.id)}
-              className="rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 ring-1 ring-slate-300 hover:bg-white"
+              className="rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 border border-slate-300 hover:bg-white"
             >
               Not this
             </button>

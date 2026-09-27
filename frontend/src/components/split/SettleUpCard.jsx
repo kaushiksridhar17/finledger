@@ -34,7 +34,7 @@ export default function SettleUpCard({ group, onChanged, onEditMember, onError }
   }
 
   return (
-    <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+    <section className="rounded-lg bg-white p-5 border border-slate-200">
       <h2 className="font-semibold text-slate-900">Settle up</h2>
       {group.settleUp.length === 0 ? (
         <p className="mt-2 text-sm text-slate-600">Everyone's settled up.</p>
@@ -50,7 +50,7 @@ export default function SettleUpCard({ group, onChanged, onEditMember, onError }
               const youPay = payer?.self
               const youGet = payee?.self
               return (
-                <li key={`${t.fromMemberId}-${t.toMemberId}`} className="rounded-xl bg-slate-50 px-3 py-2.5">
+                <li key={`${t.fromMemberId}-${t.toMemberId}`} className="rounded-md bg-slate-50 px-3 py-2.5">
                   <p className="text-sm text-slate-800">
                     <span className="font-medium">{nameOf(t.fromMemberId)}</span> {youPay ? 'pay' : 'pays'}{' '}
                     <span className="font-medium">{youGet ? 'you' : nameOf(t.toMemberId)}</span>

@@ -95,7 +95,7 @@ export default function NotificationBell() {
       </button>
 
       {open && (
-        <div className="absolute right-0 z-40 mt-2 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl bg-white shadow-lg ring-1 ring-slate-200">
+        <div className="absolute right-0 z-40 mt-2 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-md bg-white shadow-lg border border-slate-200">
           <div className="flex items-center justify-between border-b border-slate-100 px-4 py-2">
             <span className="text-sm font-semibold text-slate-900">Notifications</span>
             {data.unreadCount > 0 && (
@@ -106,7 +106,7 @@ export default function NotificationBell() {
           </div>
 
           {data.items.length === 0 ? (
-            <p className="px-4 py-6 text-center text-sm text-slate-500">Nothing yet.</p>
+            <p className="px-4 py-6 text-center text-sm text-slate-500">No notifications.</p>
           ) : (
             <ul className="max-h-96 divide-y divide-slate-100 overflow-y-auto">
               {data.items.map((item) => (
@@ -117,7 +117,7 @@ export default function NotificationBell() {
                     className={`block w-full px-4 py-3 text-left hover:bg-slate-50 ${item.read ? '' : 'bg-emerald-50/50'}`}
                   >
                     <p className="flex items-start gap-2 text-sm font-medium text-slate-900">
-                      {!item.read && <span className="mt-1.5 inline-block h-2 w-2 shrink-0 rounded-full bg-emerald-600" />}
+                      {!item.read && <span className="mt-1.5 inline-block h-2 w-2 shrink-0 rounded-full bg-emerald-700" />}
                       <span>{item.title}</span>
                     </p>
                     <p className="mt-0.5 text-sm text-slate-600">{item.message}</p>

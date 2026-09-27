@@ -52,15 +52,13 @@ export default function SplitPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Split with friends</h1>
-          <p className="mt-1 text-slate-500">
-            Share trip and flat costs, see who owes whom, and settle up in as few payments as possible.
-          </p>
+          <h1 className="text-2xl font-semibold text-slate-900">Split</h1>
+          <p className="mt-1 text-slate-500">Shared costs with friends and flatmates.</p>
         </div>
         <button
           type="button"
           onClick={() => setCreating(true)}
-          className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+          className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800"
         >
           New group
         </button>
@@ -71,11 +69,11 @@ export default function SplitPage() {
 
       {groups && groups.length > 0 && (
         <div className="grid gap-4 sm:grid-cols-2">
-          <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+          <div className="rounded-lg bg-white p-5 border border-slate-200">
             <p className="text-sm text-slate-500">Friends owe you</p>
             <p className="mt-1 text-2xl font-semibold tabular-nums text-emerald-700">{formatPaise(owedToYou)}</p>
           </div>
-          <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+          <div className="rounded-lg bg-white p-5 border border-slate-200">
             <p className="text-sm text-slate-500">You owe friends</p>
             <p className="mt-1 text-2xl font-semibold tabular-nums text-rose-700">{formatPaise(youOwe)}</p>
           </div>
@@ -83,8 +81,8 @@ export default function SplitPage() {
       )}
 
       {groups && groups.length === 0 && (
-        <div className="rounded-2xl bg-white p-8 text-center text-slate-600 shadow-sm ring-1 ring-slate-200">
-          No groups yet. Make one for a trip, your flat, or a dinner, and add the friends you're splitting with.
+        <div className="rounded-lg bg-white p-8 text-center text-slate-600 border border-slate-200">
+          No groups yet.
         </div>
       )}
 
@@ -94,7 +92,7 @@ export default function SplitPage() {
             <li key={group.id}>
               <Link
                 to={`/split/${group.id}`}
-                className="block rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 hover:ring-emerald-300"
+                className="block rounded-lg bg-white p-5 border border-slate-200 hover:ring-emerald-300"
               >
                 <p className="font-semibold text-slate-900">{group.name}</p>
                 <p className="mt-0.5 truncate text-sm text-slate-500">{friendsText(group.friendNames)}</p>

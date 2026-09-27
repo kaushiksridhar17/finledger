@@ -52,15 +52,15 @@ export default function MemberForm({ groupId, member, onClose, onSaved }) {
           />
           <p className="mt-1 text-xs text-slate-500">
             {member?.self
-              ? 'Your UPI ID lets you show friends a QR code to pay you back.'
-              : 'Used for "Pay with UPI", and to spot their repayments in your bank statement.'}
+              ? 'Lets you show friends a QR code to pay you back.'
+              : 'Used for UPI payments, and to match their repayments in your bank statement.'}
           </p>
         </div>
         <div className="flex justify-end">
           <button
             type="submit"
             disabled={busy}
-            className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-60"
+            className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800 disabled:opacity-60"
           >
             {busy ? 'Saving...' : 'Save'}
           </button>

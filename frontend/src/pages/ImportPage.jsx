@@ -57,15 +57,11 @@ export default function ImportPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold text-slate-900">Import a bank statement</h1>
-        <p className="mt-1 text-slate-500">
-          Download a statement as CSV from your bank's website and upload it here. Transactions are added and sorted
-          into categories automatically.
-        </p>
       </div>
 
       <ErrorBanner message={error} />
 
-      <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+      <section className="rounded-lg bg-white p-6 border border-slate-200">
         {accounts ? (
           <UploadForm accounts={accounts} onUploaded={() => setReloadKey((k) => k + 1)} />
         ) : (
@@ -73,12 +69,12 @@ export default function ImportPage() {
         )}
       </section>
 
-      <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+      <section className="rounded-lg bg-white p-6 border border-slate-200">
         <h2 className="mb-2 text-lg font-semibold text-slate-900">Recent imports</h2>
         {imports ? <ImportHistory imports={imports} /> : <p className="text-slate-500">Loading...</p>}
       </section>
 
-      <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+      <section className="rounded-lg bg-white p-6 border border-slate-200">
         <h2 className="mb-2 text-lg font-semibold text-slate-900">Categorisation rules</h2>
         <RulesSection categories={categories} />
       </section>

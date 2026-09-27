@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router'
 import { getDashboard } from '../api/dashboard.js'
 import { upcomingBills } from '../api/recurring.js'
-import { useAuth } from '../auth/useAuth.js'
 import CategoryBreakdown from '../components/dashboard/CategoryBreakdown.jsx'
 import MonthlyChart from '../components/dashboard/MonthlyChart.jsx'
 import StatTile from '../components/dashboard/StatTile.jsx'
@@ -13,7 +12,6 @@ import { currentMonth, formatMonth, shiftMonth } from '../lib/months.js'
 import { dueLabel } from '../lib/recurring.js'
 
 export default function DashboardPage() {
-  const { user } = useAuth()
   const [month, setMonth] = useState(currentMonth)
   const [data, setData] = useState(null)
   const [error, setError] = useState(null)
@@ -58,8 +56,7 @@ export default function DashboardPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Hi, {user?.name}</h1>
-          <p className="mt-1 text-slate-500">Here's how your money moved.</p>
+          <h1 className="text-2xl font-semibold text-slate-900">Dashboard</h1>
         </div>
 
         <div className="flex items-center gap-2">
@@ -67,7 +64,7 @@ export default function DashboardPage() {
             type="button"
             onClick={() => setMonth((m) => shiftMonth(m, -1))}
             aria-label="Previous month"
-            className="rounded-lg px-3 py-1.5 text-slate-600 ring-1 ring-slate-300 hover:bg-slate-100"
+            className="rounded-lg px-3 py-1.5 text-slate-600 border border-slate-300 hover:bg-slate-100"
           >
             &lsaquo;
           </button>
@@ -77,7 +74,7 @@ export default function DashboardPage() {
             onClick={() => setMonth((m) => shiftMonth(m, 1))}
             disabled={isLatestMonth}
             aria-label="Next month"
-            className="rounded-lg px-3 py-1.5 text-slate-600 ring-1 ring-slate-300 hover:bg-slate-100 disabled:opacity-40"
+            className="rounded-lg px-3 py-1.5 text-slate-600 border border-slate-300 hover:bg-slate-100 disabled:opacity-40"
           >
             &rsaquo;
           </button>
@@ -89,13 +86,13 @@ export default function DashboardPage() {
       {!data && !error && <p className="text-slate-500">Loading...</p>}
 
       {data && !hasAnyData && (
-        <div className="rounded-2xl bg-white p-8 text-center shadow-sm ring-1 ring-slate-200">
+        <div className="rounded-lg bg-white p-8 text-center border border-slate-200">
           <p className="text-slate-600">
-            Nothing to show yet.{' '}
-            <Link to="/accounts" className="font-medium text-emerald-600 hover:text-emerald-700">
+            Nothing here yet.{' '}
+            <Link to="/accounts" className="font-medium text-emerald-700 hover:text-emerald-800">
               Add an account
             </Link>{' '}
-            and a few transactions, and this page fills in.
+            and some transactions to see totals and charts.
           </p>
         </div>
       )}
@@ -114,10 +111,10 @@ export default function DashboardPage() {
           </div>
 
           {upcoming.length > 0 && (
-            <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+            <section className="rounded-lg bg-white p-6 border border-slate-200">
               <div className="mb-3 flex items-baseline justify-between">
                 <h2 className="text-lg font-semibold text-slate-900">Coming up in the next 2 weeks</h2>
-                <Link to="/recurring" className="text-sm font-medium text-emerald-600 hover:text-emerald-700">
+                <Link to="/recurring" className="text-sm font-medium text-emerald-700 hover:text-emerald-800">
                   All bills
                 </Link>
               </div>
@@ -138,22 +135,22 @@ export default function DashboardPage() {
             </section>
           )}
 
-          <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+          <section className="rounded-lg bg-white p-6 border border-slate-200">
             <h2 className="text-lg font-semibold text-slate-900">Income and spending, last 12 months</h2>
             <p className="mb-4 text-sm text-slate-500">Click a month to see it in detail.</p>
             <MonthlyChart months={data.monthly} selectedMonth={month} onSelectMonth={setMonth} />
           </section>
 
           <div className="grid gap-6 lg:grid-cols-2">
-            <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+            <section className="rounded-lg bg-white p-6 border border-slate-200">
               <h2 className="mb-4 text-lg font-semibold text-slate-900">Where it went in {formatMonth(month)}</h2>
               <CategoryBreakdown categories={data.spendingByCategory} totalPaise={data.spendingPaise} />
             </section>
 
-            <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+            <section className="rounded-lg bg-white p-6 border border-slate-200">
               <div className="mb-4 flex items-baseline justify-between">
                 <h2 className="text-lg font-semibold text-slate-900">Recent transactions</h2>
-                <Link to="/transactions" className="text-sm font-medium text-emerald-600 hover:text-emerald-700">
+                <Link to="/transactions" className="text-sm font-medium text-emerald-700 hover:text-emerald-800">
                   View all
                 </Link>
               </div>
