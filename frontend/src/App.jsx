@@ -4,10 +4,12 @@ import AppLayout from './components/AppLayout.jsx'
 import AccountsPage from './pages/AccountsPage.jsx'
 import BudgetsPage from './pages/BudgetsPage.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
+import GroupPage from './pages/GroupPage.jsx'
 import ImportPage from './pages/ImportPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import RecurringPage from './pages/RecurringPage.jsx'
 import RegisterPage from './pages/RegisterPage.jsx'
+import SplitPage from './pages/SplitPage.jsx'
 import TransactionsPage from './pages/TransactionsPage.jsx'
 
 function App() {
@@ -29,6 +31,8 @@ function App() {
         <Route path="transactions" element={<TransactionsPage />} />
         <Route path="budgets" element={<BudgetsPage />} />
         <Route path="recurring" element={<RecurringPage />} />
+        <Route path="split" element={<SplitPage />} />
+        <Route path="split/:groupId" element={<GroupPage />} />
         <Route path="accounts" element={<AccountsPage />} />
         <Route path="import" element={<ImportPage />} />
       </Route>

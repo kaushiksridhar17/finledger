@@ -6,5 +6,6 @@ public enum NotificationType {
     BILL_DUE,
     RECURRING_FOUND,
     IMPORT_FINISHED,
-    IMPORT_FAILED
+    IMPORT_FAILED,
+    SETTLEMENT_MATCH
 }

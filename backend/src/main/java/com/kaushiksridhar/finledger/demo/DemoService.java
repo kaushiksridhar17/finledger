@@ -37,8 +37,9 @@ import com.kaushiksridhar.finledger.user.User;
 import com.kaushiksridhar.finledger.user.UserRepository;
 
 /**
- * "Try the demo": every click gets its own throwaway user filled with a year of history,
- * so visitors never see or change each other's data. DemoCleanupJob deletes them after the TTL.
+ * "Try the demo": every click gets its own throwaway user filled with a year of history, budgets,
+ * bills and split groups, so visitors never see or change each other's data.
+ * DemoCleanupJob deletes them after the TTL.
  */
 @Service
 public class DemoService {
@@ -69,6 +70,7 @@ public class DemoService {
     private final BudgetService budgetService;
     private final BudgetAlertService budgetAlertService;
     private final RecurringService recurringService;
+    private final DemoSplitGroups demoSplitGroups;
     private final Clock clock;
 
     public DemoService(UserRepository userRepository,
@@ -80,6 +82,7 @@ public class DemoService {
             BudgetService budgetService,
             BudgetAlertService budgetAlertService,
             RecurringService recurringService,
+            DemoSplitGroups demoSplitGroups,
             Clock clock) {
         this.userRepository = userRepository;
         this.accountRepository = accountRepository;
@@ -90,6 +93,7 @@ public class DemoService {
         this.budgetService = budgetService;
         this.budgetAlertService = budgetAlertService;
         this.recurringService = recurringService;
+        this.demoSplitGroups = demoSplitGroups;
         this.clock = clock;
     }
 
@@ -116,9 +120,11 @@ public class DemoService {
         Map<String, Long> categoryIds = categoryRepository.findVisibleTo(user.getId()).stream()
                 .collect(Collectors.toMap(Category::getName, Category::getId));
 
-        List<DemoTransaction> transactions = DemoDataGenerator.generate(LocalDate.ofInstant(now, AppTime.ZONE), SEED);
+        LocalDate today = LocalDate.ofInstant(now, AppTime.ZONE);
+        List<DemoTransaction> transactions = DemoDataGenerator.generate(today, SEED);
         insertTransactions(user.getId(), transactions, accountIds, categoryIds, now);
         setUpBudgetsAndBills(user.getId(), categoryIds);
+        demoSplitGroups.create(user.getId(), accountIds.get(AccountKey.HDFC), categoryIds.get("Transfer"), today);
 
         return user;
     }

@@ -7,6 +7,7 @@ const NAV_ITEMS = [
   { to: '/transactions', label: 'Transactions' },
   { to: '/budgets', label: 'Budgets' },
   { to: '/recurring', label: 'Bills' },
+  { to: '/split', label: 'Split' },
   { to: '/accounts', label: 'Accounts' },
   { to: '/import', label: 'Import' },
 ]

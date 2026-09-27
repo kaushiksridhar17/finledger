@@ -73,6 +73,32 @@ class DemoFlowTest {
     }
 
     @Test
+    @DisplayName("the demo has two split groups, and Kabir's repayment is waiting to be confirmed")
+    void demoSplitGroups() throws Exception {
+        String auth = bearer(mockMvc.perform(post("/api/auth/demo")).andExpect(status().isOk()).andReturn());
+
+        String groups = body("/api/groups", auth);
+        List<String> names = JsonPath.read(groups, "$[*].name");
+        assertThat(names).containsExactly("Flat 402", "Goa trip");
+        Number goaBalance = JsonPath.<List<Number>>read(groups, "$[?(@.name == 'Goa trip')].myBalancePaise").get(0);
+        Number flatBalance = JsonPath.<List<Number>>read(groups, "$[?(@.name == 'Flat 402')].myBalancePaise").get(0);
+        assertThat(goaBalance.longValue()).isEqualTo(1_020_000);    // friends owe you Rs 10,200
+        assertThat(flatBalance.longValue()).isEqualTo(-349_000);    // you owe Priya Rs 3,490
+
+        Number goaId = JsonPath.<List<Number>>read(groups, "$[?(@.name == 'Goa trip')].id").get(0);
+        String goa = body("/api/groups/" + goaId, auth);
+        List<Object> settleUp = JsonPath.read(goa, "$.settleUp");
+        List<String> suggestedFrom = JsonPath.read(goa, "$.suggestions[*].memberName");
+        Number suggestedAmount = JsonPath.read(goa, "$.suggestions[0].amountPaise");
+        assertThat(settleUp).hasSize(3);
+        assertThat(suggestedFrom).containsExactly("Kabir Singh");
+        assertThat(suggestedAmount.longValue()).isEqualTo(890_000);
+
+        List<String> types = JsonPath.read(body("/api/notifications", auth), "$.items[*].type");
+        assertThat(types).contains("SETTLEMENT_MATCH");
+    }
+
+    @Test
     @DisplayName("two visitors get two separate demo users")
     void eachDemoIsSeparate() throws Exception {
         String first = bearer(mockMvc.perform(post("/api/auth/demo")).andExpect(status().isOk()).andReturn());
